@@ -1,0 +1,350 @@
+ARM GAS  /tmp/cc8gJutV.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"lwip.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.rodata.MX_LWIP_Init.str1.4,"aMS",%progbits,1
+  18              		.align	2
+  19              	.LC0:
+  20 0000 50485920 		.ascii	"PHY Stat: 0x%lx, rc=%d\012\000"
+  20      53746174 
+  20      3A203078 
+  20      256C782C 
+  20      2072633D 
+  21              		.section	.text.MX_LWIP_Init,"ax",%progbits
+  22              		.align	1
+  23              		.global	MX_LWIP_Init
+  24              		.arch armv7e-m
+  25              		.syntax unified
+  26              		.thumb
+  27              		.thumb_func
+  28              		.fpu fpv4-sp-d16
+  30              	MX_LWIP_Init:
+  31              	.LFB159:
+  32              		.file 1 "Src/lwip.c"
+   1:Src/lwip.c    **** /**
+   2:Src/lwip.c    ****  ******************************************************************************
+   3:Src/lwip.c    ****   * File Name          : LWIP.c
+   4:Src/lwip.c    ****   * Description        : This file provides initialization code for LWIP
+   5:Src/lwip.c    ****   *                      middleWare.
+   6:Src/lwip.c    ****   ******************************************************************************
+   7:Src/lwip.c    ****   * @attention
+   8:Src/lwip.c    ****   *
+   9:Src/lwip.c    ****   * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+  10:Src/lwip.c    ****   * All rights reserved.</center></h2>
+  11:Src/lwip.c    ****   *
+  12:Src/lwip.c    ****   * This software component is licensed by ST under Ultimate Liberty license
+  13:Src/lwip.c    ****   * SLA0044, the "License"; You may not use this file except in compliance with
+  14:Src/lwip.c    ****   * the License. You may obtain a copy of the License at:
+  15:Src/lwip.c    ****   *                             www.st.com/SLA0044
+  16:Src/lwip.c    ****   *
+  17:Src/lwip.c    ****   ******************************************************************************
+  18:Src/lwip.c    ****   */
+  19:Src/lwip.c    ****   
+  20:Src/lwip.c    **** /* Includes ------------------------------------------------------------------*/
+  21:Src/lwip.c    **** #include "lwip.h"
+  22:Src/lwip.c    **** #include "lwip/init.h"
+ARM GAS  /tmp/cc8gJutV.s 			page 2
+
+
+  23:Src/lwip.c    **** #include "lwip/netif.h"
+  24:Src/lwip.c    **** #if defined ( __CC_ARM )  /* MDK ARM Compiler */
+  25:Src/lwip.c    **** #include "lwip/sio.h"
+  26:Src/lwip.c    **** #endif /* MDK ARM Compiler */
+  27:Src/lwip.c    **** #include "stm32f4xx_hal.h"
+  28:Src/lwip.c    **** #include <string.h>
+  29:Src/lwip.c    **** 
+  30:Src/lwip.c    **** /* USER CODE BEGIN 0 */
+  31:Src/lwip.c    **** 
+  32:Src/lwip.c    **** /* USER CODE END 0 */
+  33:Src/lwip.c    **** /* Private function prototypes -----------------------------------------------*/
+  34:Src/lwip.c    **** /* ETH Variables initialization ----------------------------------------------*/
+  35:Src/lwip.c    **** void Error_Handler(void);
+  36:Src/lwip.c    **** 
+  37:Src/lwip.c    **** /* USER CODE BEGIN 1 */
+  38:Src/lwip.c    **** 
+  39:Src/lwip.c    **** /* USER CODE END 1 */
+  40:Src/lwip.c    **** 
+  41:Src/lwip.c    **** /* Variables Initialization */
+  42:Src/lwip.c    **** struct netif gnetif;
+  43:Src/lwip.c    **** ip4_addr_t ipaddr;
+  44:Src/lwip.c    **** ip4_addr_t netmask;
+  45:Src/lwip.c    **** ip4_addr_t gw;
+  46:Src/lwip.c    **** 
+  47:Src/lwip.c    **** /* USER CODE BEGIN 2 */
+  48:Src/lwip.c    **** // TODO: for debugging: remove
+  49:Src/lwip.c    **** extern ETH_HandleTypeDef heth;
+  50:Src/lwip.c    **** /* USER CODE END 2 */
+  51:Src/lwip.c    **** 
+  52:Src/lwip.c    **** extern UART_HandleTypeDef huart3;
+  53:Src/lwip.c    **** 
+  54:Src/lwip.c    **** /**
+  55:Src/lwip.c    ****   * LwIP initialization function
+  56:Src/lwip.c    ****   */
+  57:Src/lwip.c    **** void MX_LWIP_Init(void)
+  58:Src/lwip.c    **** {
+  33              		.loc 1 58 1 view -0
+  34              		.cfi_startproc
+  35              		@ args = 0, pretend = 0, frame = 80
+  36              		@ frame_needed = 0, uses_anonymous_args = 0
+  37 0000 30B5     		push	{r4, r5, lr}
+  38              	.LCFI0:
+  39              		.cfi_def_cfa_offset 12
+  40              		.cfi_offset 4, -12
+  41              		.cfi_offset 5, -8
+  42              		.cfi_offset 14, -4
+  43 0002 99B0     		sub	sp, sp, #100
+  44              	.LCFI1:
+  45              		.cfi_def_cfa_offset 112
+  59:Src/lwip.c    ****   /* Initialize the LwIP stack with RTOS */
+  60:Src/lwip.c    ****   tcpip_init( NULL, NULL );
+  46              		.loc 1 60 3 view .LVU1
+  47 0004 0021     		movs	r1, #0
+  48 0006 0846     		mov	r0, r1
+  49 0008 FFF7FEFF 		bl	tcpip_init
+  50              	.LVL0:
+  61:Src/lwip.c    **** 
+ARM GAS  /tmp/cc8gJutV.s 			page 3
+
+
+  62:Src/lwip.c    ****   /* IP addresses initialization with DHCP (IPv4) */
+  63:Src/lwip.c    ****   IP4_ADDR(&ipaddr, 192, 168, 0, 100);
+  51              		.loc 1 63 3 view .LVU2
+  52 000c 1F49     		ldr	r1, .L5
+  53 000e 204B     		ldr	r3, .L5+4
+  54 0010 0B60     		str	r3, [r1]
+  64:Src/lwip.c    ****   IP4_ADDR(&netmask, 255, 255, 0, 0);
+  55              		.loc 1 64 3 view .LVU3
+  56 0012 204A     		ldr	r2, .L5+8
+  57 0014 4FF6FF73 		movw	r3, #65535
+  58 0018 1360     		str	r3, [r2]
+  65:Src/lwip.c    ****   IP4_ADDR(&gw, 0, 0, 0, 0);
+  59              		.loc 1 65 3 view .LVU4
+  60 001a 1F4B     		ldr	r3, .L5+12
+  61 001c 0025     		movs	r5, #0
+  62 001e 1D60     		str	r5, [r3]
+  66:Src/lwip.c    **** 
+  67:Src/lwip.c    ****   /* add the network interface (IPv4/IPv6) with RTOS */
+  68:Src/lwip.c    ****   netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
+  63              		.loc 1 68 3 view .LVU5
+  64 0020 1E4C     		ldr	r4, .L5+16
+  65 0022 1F48     		ldr	r0, .L5+20
+  66 0024 0290     		str	r0, [sp, #8]
+  67 0026 1F48     		ldr	r0, .L5+24
+  68 0028 0190     		str	r0, [sp, #4]
+  69 002a 0095     		str	r5, [sp]
+  70 002c 2046     		mov	r0, r4
+  71 002e FFF7FEFF 		bl	netif_add
+  72              	.LVL1:
+  69:Src/lwip.c    **** 
+  70:Src/lwip.c    ****   // Print out the status register of the PHY
+  71:Src/lwip.c    ****   uint32_t reg = 0x00;
+  73              		.loc 1 71 3 view .LVU6
+  74              		.loc 1 71 12 is_stmt 0 view .LVU7
+  75 0032 1795     		str	r5, [sp, #92]
+  72:Src/lwip.c    ****   int rc = HAL_ETH_ReadPHYRegister(&heth, PHY_BSR, &reg);
+  76              		.loc 1 72 3 is_stmt 1 view .LVU8
+  77              		.loc 1 72 12 is_stmt 0 view .LVU9
+  78 0034 17AA     		add	r2, sp, #92
+  79 0036 0121     		movs	r1, #1
+  80 0038 1B48     		ldr	r0, .L5+28
+  81 003a FFF7FEFF 		bl	HAL_ETH_ReadPHYRegister
+  82              	.LVL2:
+  73:Src/lwip.c    ****   char data[70];
+  83              		.loc 1 73 3 is_stmt 1 view .LVU10
+  74:Src/lwip.c    ****   snprintf(data, sizeof(data), "PHY Stat: 0x%lx, rc=%d\n", reg, rc);
+  84              		.loc 1 74 3 view .LVU11
+  85 003e 0090     		str	r0, [sp]
+  86 0040 179B     		ldr	r3, [sp, #92]
+  87 0042 1A4A     		ldr	r2, .L5+32
+  88 0044 4621     		movs	r1, #70
+  89 0046 05A8     		add	r0, sp, #20
+  90              	.LVL3:
+  91              		.loc 1 74 3 is_stmt 0 view .LVU12
+  92 0048 FFF7FEFF 		bl	snprintf
+  93              	.LVL4:
+  75:Src/lwip.c    ****   HAL_UART_Transmit(&huart3, (uint8_t*)data, strlen(data), 50);
+ARM GAS  /tmp/cc8gJutV.s 			page 4
+
+
+  94              		.loc 1 75 3 is_stmt 1 view .LVU13
+  95              		.loc 1 75 46 is_stmt 0 view .LVU14
+  96 004c 05A8     		add	r0, sp, #20
+  97 004e FFF7FEFF 		bl	strlen
+  98              	.LVL5:
+  99              		.loc 1 75 3 view .LVU15
+ 100 0052 3223     		movs	r3, #50
+ 101 0054 82B2     		uxth	r2, r0
+ 102 0056 05A9     		add	r1, sp, #20
+ 103 0058 1548     		ldr	r0, .L5+36
+ 104 005a FFF7FEFF 		bl	HAL_UART_Transmit
+ 105              	.LVL6:
+  76:Src/lwip.c    **** 
+  77:Src/lwip.c    ****   /* Registers the default network interface */
+  78:Src/lwip.c    ****   netif_set_default(&gnetif);
+ 106              		.loc 1 78 3 is_stmt 1 view .LVU16
+ 107 005e 2046     		mov	r0, r4
+ 108 0060 FFF7FEFF 		bl	netif_set_default
+ 109              	.LVL7:
+  79:Src/lwip.c    **** 
+  80:Src/lwip.c    ****   if (netif_is_link_up(&gnetif))
+ 110              		.loc 1 80 3 view .LVU17
+ 111              		.loc 1 80 7 is_stmt 0 view .LVU18
+ 112 0064 94F82D30 		ldrb	r3, [r4, #45]	@ zero_extendqisi2
+ 113              		.loc 1 80 6 view .LVU19
+ 114 0068 13F0040F 		tst	r3, #4
+ 115 006c 0AD0     		beq	.L2
+  81:Src/lwip.c    ****   {
+  82:Src/lwip.c    ****     /* When the netif is fully configured this function must be called */
+  83:Src/lwip.c    ****     netif_set_up(&gnetif);
+ 116              		.loc 1 83 5 is_stmt 1 view .LVU20
+ 117 006e 2046     		mov	r0, r4
+ 118 0070 FFF7FEFF 		bl	netif_set_up
+ 119              	.LVL8:
+ 120              	.L3:
+  84:Src/lwip.c    ****   }
+  85:Src/lwip.c    ****   else
+  86:Src/lwip.c    ****   {
+  87:Src/lwip.c    ****     /* When the netif link is down this function must be called */
+  88:Src/lwip.c    ****     netif_set_down(&gnetif);
+  89:Src/lwip.c    ****   }
+  90:Src/lwip.c    **** 
+  91:Src/lwip.c    ****   /* Start DHCP negotiation for a network interface (IPv4) */
+  92:Src/lwip.c    ****   // dhcp_start(&gnetif);
+  93:Src/lwip.c    **** 
+  94:Src/lwip.c    ****   // Start static IP allocation
+  95:Src/lwip.c    ****   netif_set_addr(&gnetif, &ipaddr, &netmask, &gw);
+ 121              		.loc 1 95 3 view .LVU21
+ 122 0074 084B     		ldr	r3, .L5+12
+ 123 0076 074A     		ldr	r2, .L5+8
+ 124 0078 0449     		ldr	r1, .L5
+ 125 007a 0848     		ldr	r0, .L5+16
+ 126 007c FFF7FEFF 		bl	netif_set_addr
+ 127              	.LVL9:
+  96:Src/lwip.c    **** 
+  97:Src/lwip.c    **** /* USER CODE BEGIN 3 */
+  98:Src/lwip.c    **** 
+ARM GAS  /tmp/cc8gJutV.s 			page 5
+
+
+  99:Src/lwip.c    **** /* USER CODE END 3 */
+ 100:Src/lwip.c    **** }
+ 128              		.loc 1 100 1 is_stmt 0 view .LVU22
+ 129 0080 19B0     		add	sp, sp, #100
+ 130              	.LCFI2:
+ 131              		.cfi_remember_state
+ 132              		.cfi_def_cfa_offset 12
+ 133              		@ sp needed
+ 134 0082 30BD     		pop	{r4, r5, pc}
+ 135              	.L2:
+ 136              	.LCFI3:
+ 137              		.cfi_restore_state
+  88:Src/lwip.c    ****   }
+ 138              		.loc 1 88 5 is_stmt 1 view .LVU23
+ 139 0084 0548     		ldr	r0, .L5+16
+ 140 0086 FFF7FEFF 		bl	netif_set_down
+ 141              	.LVL10:
+ 142 008a F3E7     		b	.L3
+ 143              	.L6:
+ 144              		.align	2
+ 145              	.L5:
+ 146 008c 00000000 		.word	ipaddr
+ 147 0090 C0A80064 		.word	1677764800
+ 148 0094 00000000 		.word	netmask
+ 149 0098 00000000 		.word	gw
+ 150 009c 00000000 		.word	gnetif
+ 151 00a0 00000000 		.word	tcpip_input
+ 152 00a4 00000000 		.word	ethernetif_init
+ 153 00a8 00000000 		.word	heth
+ 154 00ac 00000000 		.word	.LC0
+ 155 00b0 00000000 		.word	huart3
+ 156              		.cfi_endproc
+ 157              	.LFE159:
+ 159              		.comm	gw,4,4
+ 160              		.comm	netmask,4,4
+ 161              		.comm	ipaddr,4,4
+ 162              		.comm	gnetif,52,4
+ 163              		.text
+ 164              	.Letext0:
+ 165              		.file 2 "/usr/lib/gcc/arm-none-eabi/9.2.1/include/stdint.h"
+ 166              		.file 3 "Drivers/CMSIS/Include/core_cm4.h"
+ 167              		.file 4 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h"
+ 168              		.file 5 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f429xx.h"
+ 169              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 170              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 171              		.file 8 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_eth.h"
+ 172              		.file 9 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h"
+ 173              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h"
+ 174              		.file 11 "/usr/lib/gcc/arm-none-eabi/9.2.1/include/stddef.h"
+ 175              		.file 12 "/usr/include/newlib/sys/_types.h"
+ 176              		.file 13 "/usr/include/newlib/sys/reent.h"
+ 177              		.file 14 "/usr/include/newlib/sys/lock.h"
+ 178              		.file 15 "/usr/include/newlib/stdlib.h"
+ 179              		.file 16 "/usr/include/newlib/time.h"
+ 180              		.file 17 "Middlewares/Third_Party/LwIP/src/include/lwip/arch.h"
+ 181              		.file 18 "/usr/include/newlib/ctype.h"
+ 182              		.file 19 "Middlewares/Third_Party/LwIP/src/include/lwip/memp.h"
+ARM GAS  /tmp/cc8gJutV.s 			page 6
+
+
+ 183              		.file 20 "Middlewares/Third_Party/LwIP/src/include/lwip/priv/memp_priv.h"
+ 184              		.file 21 "Middlewares/Third_Party/LwIP/src/include/lwip/err.h"
+ 185              		.file 22 "Middlewares/Third_Party/LwIP/src/include/lwip/pbuf.h"
+ 186              		.file 23 "Middlewares/Third_Party/LwIP/src/include/lwip/ip4_addr.h"
+ 187              		.file 24 "Middlewares/Third_Party/LwIP/src/include/lwip/ip_addr.h"
+ 188              		.file 25 "Middlewares/Third_Party/LwIP/src/include/lwip/netif.h"
+ 189              		.file 26 "Middlewares/Third_Party/LwIP/src/include/lwip/prot/ip4.h"
+ 190              		.file 27 "Middlewares/Third_Party/LwIP/src/include/lwip/prot/ethernet.h"
+ 191              		.file 28 "Middlewares/Third_Party/LwIP/src/include/netif/ethernet.h"
+ 192              		.file 29 "Middlewares/Third_Party/LwIP/src/include/lwip/ip.h"
+ 193              		.file 30 "Middlewares/Third_Party/LwIP/src/include/lwip/udp.h"
+ 194              		.file 31 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h"
+ 195              		.file 32 "Middlewares/Third_Party/LwIP/system/arch/sys_arch.h"
+ 196              		.file 33 "Middlewares/Third_Party/LwIP/src/include/lwip/timeouts.h"
+ 197              		.file 34 "Middlewares/Third_Party/LwIP/src/include/lwip/tcpip.h"
+ 198              		.file 35 "Inc/lwip.h"
+ 199              		.file 36 "/usr/include/newlib/stdio.h"
+ 200              		.file 37 "/usr/include/newlib/string.h"
+ARM GAS  /tmp/cc8gJutV.s 			page 7
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 lwip.c
+     /tmp/cc8gJutV.s:18     .rodata.MX_LWIP_Init.str1.4:0000000000000000 $d
+     /tmp/cc8gJutV.s:22     .text.MX_LWIP_Init:0000000000000000 $t
+     /tmp/cc8gJutV.s:30     .text.MX_LWIP_Init:0000000000000000 MX_LWIP_Init
+     /tmp/cc8gJutV.s:146    .text.MX_LWIP_Init:000000000000008c $d
+                            *COM*:0000000000000004 ipaddr
+                            *COM*:0000000000000004 netmask
+                            *COM*:0000000000000004 gw
+                            *COM*:0000000000000034 gnetif
+
+UNDEFINED SYMBOLS
+tcpip_init
+netif_add
+HAL_ETH_ReadPHYRegister
+snprintf
+strlen
+HAL_UART_Transmit
+netif_set_default
+netif_set_up
+netif_set_addr
+netif_set_down
+tcpip_input
+ethernetif_init
+heth
+huart3
